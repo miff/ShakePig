@@ -6,105 +6,141 @@
 //  Copyright © 2020 miff.me. All rights reserved.
 //
 
+import AVFoundation
+import CoreMotion
 import SpriteKit
-import GameplayKit
 
 class GameScene: SKScene {
     
-    var entities = [GKEntity]()
-    var graphs = [String : GKGraph]()
+    lazy var pig: SKButton = {
+        let s = SKButton(texture: SKTexture(imageNamed: "Pig"))
+        s.zPosition = 1
+        s.position = .zero
+        s.delegate = self
+        return s
+    }()
     
-    private var lastUpdateTime : TimeInterval = 0
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
+    lazy var eyes: EyesNode = {
+        let e = EyesNode()
+        e.build()
+        e.position = .zero
+        e.setScale(0.65)
+        e.isHidden = true
+        e.zPosition = 10
+        e.delegate = self
+        return e
+    }()
+    
+    var pts: Int = 0 {
+        didSet {
+            ptsLbl.text = "\(pts)"
+        }
+    }
+    
+    var ptsLbl = SKLabelNode()
+    var isGameOver: Bool = false
+    var isLooking: Bool = false
+    var prevAcc: CMAcceleration = .init(x: 0, y: 0, z: 0)
+    var motionOffset: Double = 0.75
+  
+    let motionManager = CMMotionManager()
     
     override func sceneDidLoad() {
-
-        self.lastUpdateTime = 0
+        [eyes, pig].forEach { addChild($0) }
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
+        ptsLbl = childNode(withName: "//ptsLbl") as! SKLabelNode
+        ptsLbl.text = "0"
+        ptsLbl.position.y = safeArea.maxY - 80
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
+    }
+    
+    override func didMove(to view: SKView) {
+        motionManager.startAccelerometerUpdates()
+    }
+    
+    func shake() {
+        if isGameOver { return }
+        if isLooking {
+            isGameOver = true
+            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
             
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+            let p = UserDefaults.standard.value(forKey: "PTS") as? Int ?? 0
+            UserDefaults.standard.set(max(p, pts), forKey: "PTS")
+            
+            let vc = MenuScene(size: CGSize(width: 768, height: 1024))
+            vc.scaleMode = .aspectFill
+            vc.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            
+            let transition: SKTransition = .crossFade(withDuration: 1)
+            view?.presentScene(vc, transition: transition)
+            return
         }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+        AudioServicesPlaySystemSound(1102)
+        let coin = SKSpriteNode(texture: SKTexture(imageNamed: "Coin"))
+        coin.position = CGPoint(x: -20, y: 135)
+        coin.zPosition = CGFloat.random(in: 0...2)
+        addChild(coin)
+        
+        coin.run(.sequence([
+            .move(to: CGPoint(x: CGFloat.random(in: -35...35), y: 185), duration: 0.4),
+            .move(to: CGPoint(x: CGFloat.random(in: safeArea.minX...safeArea.maxX), y: safeArea.minY - 30), duration: 0.6),
+            .removeFromParent()
+        ])) {
+            self.pts += 1
+        }
+        
+        pig.run(.sequence([
+            .repeat(.move(to: CGPoint(x: CGFloat.random(in: -30...30), y: CGFloat.random(in: -30...30)), duration: 0.1), count: 2),
+            .move(to: .zero, duration: 0.1)
+        ]))
     }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        if isGameOver { return }
         
-        // Initialize _lastUpdateTime if it has not already been
-        if (self.lastUpdateTime == 0) {
-            self.lastUpdateTime = currentTime
+        if let accelerometerData = motionManager.accelerometerData {
+            let curAcc = accelerometerData.acceleration
+            
+            if abs(curAcc.x) - abs(prevAcc.x) > motionOffset ||
+                abs(curAcc.y) - abs(prevAcc.y) > motionOffset ||
+                abs(curAcc.z) - abs(prevAcc.z) > motionOffset {
+                shake()
+            }
+            
+            prevAcc = accelerometerData.acceleration
         }
         
-        // Calculate time since last update
-        let dt = currentTime - self.lastUpdateTime
-        
-        // Update entities
-        for entity in self.entities {
-            entity.update(deltaTime: dt)
+        let r = Int.random(in: 0...700)
+        if r == 1 {
+            if isLooking { return }
+            isLooking = true
+            motionOffset = 0.2
+            pig.isHidden = true
+            eyes.isHidden = false
+            eyes.lookAround()
         }
         
-        self.lastUpdateTime = currentTime
     }
+}
+
+extension GameScene: SKButtonDelegate {
+    func onTapSKBtn(with btn: SKButton) {
+        if btn == pig {
+            shake()
+        }
+    }
+    
+    
+}
+
+extension GameScene: EyesDelegate {
+    func onLookingEnd() {
+        isLooking = false
+        pig.isHidden = false
+        eyes.isHidden = true
+        motionOffset = 0.75
+    }
+    
+    
 }
