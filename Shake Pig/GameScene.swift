@@ -58,21 +58,28 @@ class GameScene: SKScene {
         motionManager.startAccelerometerUpdates()
     }
     
+    func gameOver() {
+        isGameOver = true
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+        
+        run(.playSoundFileNamed("CoinSpil.mp3", waitForCompletion: false))
+        
+        let p = UserDefaults.standard.value(forKey: "PTS") as? Int ?? 0
+        UserDefaults.standard.set(max(p, pts), forKey: "PTS")
+        
+        let vc = GameOverScene(size: CGSize(width: 768, height: 1024))
+        vc.pts = pts
+        vc.scaleMode = .aspectFill
+        vc.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
+        let transition: SKTransition = .crossFade(withDuration: 1)
+        view?.presentScene(vc, transition: transition)
+    }
+    
     func shake() {
         if isGameOver { return }
         if isLooking {
-            isGameOver = true
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
-            
-            let p = UserDefaults.standard.value(forKey: "PTS") as? Int ?? 0
-            UserDefaults.standard.set(max(p, pts), forKey: "PTS")
-            
-            let vc = MenuScene(size: CGSize(width: 768, height: 1024))
-            vc.scaleMode = .aspectFill
-            vc.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            
-            let transition: SKTransition = .crossFade(withDuration: 1)
-            view?.presentScene(vc, transition: transition)
+            gameOver()
             return
         }
         
@@ -81,6 +88,8 @@ class GameScene: SKScene {
         coin.position = CGPoint(x: -20, y: 135)
         coin.zPosition = CGFloat.random(in: 0...2)
         addChild(coin)
+        
+        run(.playSoundFileNamed("CoinDrop.mp3", waitForCompletion: false))
         
         coin.run(.sequence([
             .move(to: CGPoint(x: CGFloat.random(in: -35...35), y: 185), duration: 0.4),
@@ -120,8 +129,14 @@ class GameScene: SKScene {
             eyes.isHidden = false
             eyes.lookAround()
         }
-        
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if isGameOver { return }
+        if !isLooking { return }
+        gameOver()
+    }
+    
 }
 
 extension GameScene: SKButtonDelegate {

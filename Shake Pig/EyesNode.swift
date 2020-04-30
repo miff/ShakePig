@@ -53,11 +53,15 @@ class EyesNode: SKSpriteNode {
         
         loader = SKSpriteNode(texture: SKTexture(imageNamed: "Loader"))
         loader.anchorPoint = CGPoint(x: 0, y: 0.5)
-        loader.position = CGPoint(x: -181, y: 0)
+        loader.position = CGPoint(x: -190, y: 0)
         loader.zPosition = 1
         bar.addChild(loader)
         
         addChild(bar)
+    }
+    
+    func idle() {
+        eyes.run(.repeatForever(.animate(with: eyesFrames, timePerFrame: 0.2,  resize: false, restore: false)), withKey:"lookAround")
     }
     
     func lookAround() {

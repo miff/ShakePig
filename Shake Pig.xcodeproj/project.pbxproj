@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		9B1375FC244F99F400091CDB /* FxCoin.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9B1375FB244F99F400091CDB /* FxCoin.sks */; };
 		9B1375FE24504B6D00091CDB /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1375FD24504B6D00091CDB /* UIColor+extension.swift */; };
+		9B1376002450608C00091CDB /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1375FF2450608C00091CDB /* GameOverScene.swift */; };
+		9B13760424506CAA00091CDB /* CoinDrop.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9B13760224506CAA00091CDB /* CoinDrop.mp3 */; };
+		9B13760624506CD600091CDB /* CoinSpil.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9B13760524506CD600091CDB /* CoinSpil.mp3 */; };
 		9B5922AE244F440100917F18 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5922AD244F440100917F18 /* AppDelegate.swift */; };
 		9B5922B0244F440100917F18 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9B5922AF244F440100917F18 /* GameScene.sks */; };
 		9B5922B4244F440100917F18 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5922B3244F440100917F18 /* GameScene.swift */; };
@@ -26,6 +29,9 @@
 /* Begin PBXFileReference section */
 		9B1375FB244F99F400091CDB /* FxCoin.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FxCoin.sks; sourceTree = "<group>"; };
 		9B1375FD24504B6D00091CDB /* UIColor+extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+extension.swift"; sourceTree = "<group>"; };
+		9B1375FF2450608C00091CDB /* GameOverScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
+		9B13760224506CAA00091CDB /* CoinDrop.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = CoinDrop.mp3; sourceTree = "<group>"; };
+		9B13760524506CD600091CDB /* CoinSpil.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = CoinSpil.mp3; sourceTree = "<group>"; };
 		9B5922AA244F440100917F18 /* Shake Pig.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Shake Pig.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B5922AD244F440100917F18 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9B5922AF244F440100917F18 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -75,6 +81,7 @@
 				9B5922AD244F440100917F18 /* AppDelegate.swift */,
 				9B5922AF244F440100917F18 /* GameScene.sks */,
 				9B5922B3244F440100917F18 /* GameScene.swift */,
+				9B1375FF2450608C00091CDB /* GameOverScene.swift */,
 				9B5922CF244F84F600917F18 /* MenuScene.swift */,
 				9B5922C7244F51B400917F18 /* EyesNode.swift */,
 				9B5922D1244F87C900917F18 /* SKButton.swift */,
@@ -82,6 +89,8 @@
 				9B5922CB244F79B800917F18 /* SKScene+extension.swift */,
 				9B1375FD24504B6D00091CDB /* UIColor+extension.swift */,
 				9B1375FB244F99F400091CDB /* FxCoin.sks */,
+				9B13760224506CAA00091CDB /* CoinDrop.mp3 */,
+				9B13760524506CD600091CDB /* CoinSpil.mp3 */,
 				9B5922B7244F440100917F18 /* Main.storyboard */,
 				9B5922C5244F511B00917F18 /* Eyes.atlas */,
 				9B5922BA244F440300917F18 /* Assets.xcassets */,
@@ -149,8 +158,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B13760424506CAA00091CDB /* CoinDrop.mp3 in Resources */,
 				9B5922B9244F440100917F18 /* Main.storyboard in Resources */,
 				9B5922B0244F440100917F18 /* GameScene.sks in Resources */,
+				9B13760624506CD600091CDB /* CoinSpil.mp3 in Resources */,
 				9B5922BB244F440300917F18 /* Assets.xcassets in Resources */,
 				9B5922BE244F440300917F18 /* LaunchScreen.storyboard in Resources */,
 				9B1375FC244F99F400091CDB /* FxCoin.sks in Resources */,
@@ -172,6 +183,7 @@
 				9B5922CC244F79B800917F18 /* SKScene+extension.swift in Sources */,
 				9B5922AE244F440100917F18 /* AppDelegate.swift in Sources */,
 				9B5922D0244F84F600917F18 /* MenuScene.swift in Sources */,
+				9B1376002450608C00091CDB /* GameOverScene.swift in Sources */,
 				9B1375FE24504B6D00091CDB /* UIColor+extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
